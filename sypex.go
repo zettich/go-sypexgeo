@@ -4,6 +4,7 @@ package sypexgeo
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -270,14 +271,14 @@ func (s *SxGEO) GetCity(IP string) (map[string]interface{}, error) {
 }
 
 // New SxGEO object
-func New(filename string) SxGEO {
+func New(filename string) (SxGEO, error) {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic("Database file not found")
+		return nil, err
 	} else if string(dat[:3]) != `SxG` && dat[3] != 22 && dat[8] != 2 {
-		panic("Wrong database format")
+		return nil, fmt.Errorf("Wrong database format")
 	} else if dat[9] != 0 {
-		panic("Only UTF-8 version is supported")
+		return nil, fmt.Errorf("Only UTF-8 version is supported")
 	}
 
 	IDLen := uint32(dat[19])
@@ -298,7 +299,7 @@ func New(filename string) SxGEO {
 	cntrEnd := cntrStart + countryLen
 	pack := strings.Split(string(dat[40:40+packLen]), string(byte(0)))
 
-	return SxGEO{
+	proto := SxGEO{
 		Version: float32(dat[3]) / 10,
 		Updated: readUint32(dat, 4),
 		finder: finder{
@@ -324,6 +325,8 @@ func New(filename string) SxGEO {
 			},
 		},
 	}
+
+	return proto, nil
 }
 
 func obj() (r map[string]interface{}) {
