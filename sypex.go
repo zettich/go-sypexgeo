@@ -457,7 +457,7 @@ func (s *SxGEO) GetCity(IP string) (map[string]interface{}, error) {
 }
 
 // New SxGEO object
-func New(filename string) (SxGEO, error) {
+func New(filename string) (*SxGEO, error) {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -485,7 +485,7 @@ func New(filename string) (SxGEO, error) {
 	cntrEnd := cntrStart + countryLen
 	pack := strings.Split(string(dat[40:40+packLen]), string(byte(0)))
 
-	proto := SxGEO{
+	proto := &SxGEO{
 		Version: float32(dat[3]) / 10,
 		Updated: readUint32(dat, 4),
 		finder: finder{
