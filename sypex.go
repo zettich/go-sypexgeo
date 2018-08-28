@@ -41,25 +41,39 @@ type (
 	}
 	// Country struct
 	Country struct {
-		ID     uint8
-		ISO    string
-		NameEn string
-		NameRu string
-		Lon    float32
-		Lat    float32
+		ID         uint8
+		ISO        string
+		TimeZone   string
+		NameEn     string
+		NameRu     string
+		CapitalEn  string
+		CapitalRu  string
+		CapitalId  uint8
+		Continent  string
+		Neighbours string
+		Currency   string
+		VK         uint8
+		Phone      string
+		Lon        float32
+		Lat        float32
 	}
 	// Region struct
 	Region struct {
-		ID     uint32
-		ISO    string
-		NameEn string
-		NameRu string
+		ID       uint32
+		ISO      string
+		TimeZone string
+		OKATO    string
+		VK       uint8
+		NameEn   string
+		NameRu   string
 	}
 	// City struct
 	City struct {
 		ID     uint32
 		NameEn string
 		NameRu string
+		OKATO  string
+		VK     uint8
 		Lon    float32
 		Lat    float32
 	}
@@ -180,6 +194,7 @@ func (f *finder) unpack(seek, uType uint32) (map[string]interface{}, error) {
 	var cursor int
 	for _, el := range strings.Split(f.Pack[uType], "/") {
 		cmd := strings.Split(el, ":")
+
 		switch string(cmd[0][0]) {
 		case "T":
 			ret[cmd[1]] = raw[cursor]
@@ -240,6 +255,33 @@ func (f *finder) parseToStruct(seek uint32, full bool) (Result, error) {
 			if f, ok := country["iso"]; ok {
 				ret.Country.ISO, _ = f.(string)
 			}
+			if f, ok := country["timezone"]; ok {
+				ret.Country.TimeZone, _ = f.(string)
+			}
+			if f, ok := country["cur_code"]; ok {
+				ret.Country.Currency, _ = f.(string)
+			}
+			if f, ok := country["continent"]; ok {
+				ret.Country.Continent, _ = f.(string)
+			}
+			if f, ok := country["vk"]; ok {
+				ret.Country.VK, _ = f.(uint8)
+			}
+			if f, ok := country["capital_en"]; ok {
+				ret.Country.CapitalEn, _ = f.(string)
+			}
+			if f, ok := country["capital_ru"]; ok {
+				ret.Country.CapitalRu, _ = f.(string)
+			}
+			if f, ok := country["capital_id"]; ok {
+				ret.Country.CapitalId, _ = f.(uint8)
+			}
+			if f, ok := country["neighbours"]; ok {
+				ret.Country.Neighbours, _ = f.(string)
+			}
+			if f, ok := country["phone"]; ok {
+				ret.Country.Phone, _ = f.(string)
+			}
 		}
 		if cregionIfce, exists := result["region"]; exists {
 			region, _ := cregionIfce.(map[string]interface{})
@@ -255,6 +297,15 @@ func (f *finder) parseToStruct(seek uint32, full bool) (Result, error) {
 			if f, ok := region["iso"]; ok {
 				ret.Region.ISO, _ = f.(string)
 			}
+			if f, ok := region["timezone"]; ok {
+				ret.Region.TimeZone, _ = f.(string)
+			}
+			if f, ok := region["okato"]; ok {
+				ret.Region.OKATO, _ = f.(string)
+			}
+			if f, ok := region["vk"]; ok {
+				ret.Region.VK, _ = f.(uint8)
+			}
 		}
 		if cityIfce, exists := result["city"]; exists {
 			city, _ := cityIfce.(map[string]interface{})
@@ -266,6 +317,12 @@ func (f *finder) parseToStruct(seek uint32, full bool) (Result, error) {
 			}
 			if f, ok := city["name_ru"]; ok {
 				ret.City.NameRu, _ = f.(string)
+			}
+			if f, ok := city["okato"]; ok {
+				ret.City.OKATO, _ = f.(string)
+			}
+			if f, ok := city["vk"]; ok {
+				ret.City.VK, _ = f.(uint8)
 			}
 			if f, ok := city["lat"]; ok {
 				ret.City.Lat, _ = f.(float32)
