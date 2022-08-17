@@ -1,3 +1,3 @@
-module github.com/night-codes/go-sypexgeo
+module github.com/zettich/go-sypexgeo
 
 go 1.16
